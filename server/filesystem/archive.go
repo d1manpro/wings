@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -142,7 +143,7 @@ func (a *Archive) Stream(ctx context.Context, w io.Writer) error {
 
 	// Create a new gzip writer around the file.
 	gw, _ := pgzip.NewWriterLevel(w, compressionLevel)
-	_ = gw.SetConcurrency(1<<20, 1)
+	_ = gw.SetConcurrency(1<<20, runtime.NumCPU())
 	defer gw.Close()
 
 	// Create a new tar writer around the gzip writer.
