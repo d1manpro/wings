@@ -56,6 +56,12 @@ func AttachApiClient(client remote.Client) gin.HandlerFunc {
 // context, so it can be reported properly. If the error is missing a stacktrace
 // at the time it is called the stack will be attached.
 func CaptureAndAbort(c *gin.Context, err error) {
+	if strings.Contains(err.Error(), "malformed") || strings.Contains(err.Error(), "invalid") {
+		c.AbortWithStatusJSON(400, map[string]string{
+			"error": "invalid token",
+		})
+		return
+	}
 	c.Abort()
 	c.Error(errors.WithStackDepthIf(err, 1))
 }
