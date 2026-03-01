@@ -57,11 +57,16 @@ func AttachApiClient(client remote.Client) gin.HandlerFunc {
 // at the time it is called the stack will be attached.
 func CaptureAndAbort(c *gin.Context, err error) {
 	if strings.Contains(err.Error(), "malformed") || strings.Contains(err.Error(), "invalid") {
-		c.AbortWithStatusJSON(400, map[string]string{
+		ip := c.ClientIP()
+		registerInvalid(ip)
+
+		c.AbortWithStatusJSON(400, gin.H{
 			"error": "invalid token",
 		})
+
 		return
 	}
+
 	c.Abort()
 	c.Error(errors.WithStackDepthIf(err, 1))
 }
